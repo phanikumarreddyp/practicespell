@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spelling Bee Practice</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f5f5f5;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    h3 {
+      color: #555;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid #ddd;
+      margin: 20px 0;
+    }
+
+    /* Control section */
+    .control-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    /* Word buttons grid */
+    #wordButtons {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      min-height: 100px;
+    }
+
+    button {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .word-btn {
+      background: #e3f2fd;
+      color: #1976d2;
+      border: 1px solid #90caf9;
+      font-weight: 500;
+    }
+
+    .word-btn:hover {
+      background: #bbdefb;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .action-buttons button {
+      flex: 1;
+      min-width: 140px;
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+    }
+
+    .action-buttons button:hover {
+      background: #45a049;
+    }
+
+    /* Result display */
+    #result {
+      margin-top: 10px;
+      font-size: 18px;
+      padding: 15px;
+      background: white;
+      border-radius: 4px;
+      text-align: center;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .correct {
+      color: #2e7d32;
+      font-weight: bold;
+      background: #c8e6c9;
+    }
+
+    .wrong {
+      color: #c62828;
+      font-weight: bold;
+      background: #ffcdd2;
+    }
+
+    /* Current word display */
+    .word-display {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #currentWord {
+      font-size: 32px;
+      color: #1976d2;
+      font-weight: bold;
+      word-break: break-word;
+    }
+
+    .word-definition {
+      margin-top: 20px;
+      text-align: left;
+      border-top: 2px solid #e0e0e0;
+      padding-top: 15px;
+    }
+
+    .definition-item {
+      margin-bottom: 12px;
+    }
+
+    .definition-label {
+      font-weight: bold;
+      color: #1976d2;
+      font-size: 14px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .definition-value {
+      color: #333;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .pronunciation {
+      color: #666;
+      font-style: italic;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .meanings-list {
+      margin-top: 8px;
+      padding-left: 20px;
+    }
+
+    .meanings-list li {
+      margin-bottom: 6px;
+      color: #444;
+    }
+
+    .loading {
+      color: #999;
+      font-style: italic;
+    }
+
+    .error {
+      color: #c62828;
+      padding: 10px;
+      background: #ffcdd2;
+      border-radius: 4px;
+    }
+
+    /* Add word section */
+    .add-word-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #newWordInput {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .input-group button {
+      background: #2196f3;
+      color: white;
+      font-weight: bold;
+      min-width: 100px;
+    }
+
+    .input-group button:hover {
+      background: #0b7dda;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      #wordButtons {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .action-buttons button {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+
+      #newWordInput {
+        width: 100%;
+        min-width: unset;
+      }
+
+      #currentWord {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #wordButtons {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 6px;
+        padding: 8px;
+      }
+
+      .word-btn {
+        font-size: 12px;
+        padding: 8px 6px;
+      }
+
+      button {
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+
+      #currentWord {
+        font-size: 20px;
+      }
+
+      #result {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>📝 Spelling Bee Practice</h1>
+
+<div class="control-section">
+  <label for="fileSelect"><b>Select Level:</b></label>
+  <select id="fileSelect" onchange="loadWords()">
+    <option value="4k1b-a.txt">4k1b-a</option>
+    <option value="4k1b-b.txt">4k1b-b</option>
+    <option value="4k1b-c.txt">4k1b-c</option>
+    <option value="4k1b-d.txt">4k1b-d</option>
+    <option value="4k1b-e.txt">4k1b-e</option>
+    <option value="4k1b-f.txt">4k1b-f</option>
+    <option value="4k1b-g.txt">4k1b-g</option>
+    <option value="4k1b-h.txt">4k1b-h</option>
+    <option value="4k1b-i.txt">4k1b-i</option>
+    <option value="4k1b-j.txt">4k1b-j</option>
+    <option value="4k1b-k.txt">4k1b-k</option>
+    <option value="4k1b-l.txt">4k1b-l</option>
+    <option value="4k1b-m.txt">4k1b-m</option>
+    <option value="4k1b-n.txt">4k1b-n</option>
+    <option value="4k1b-o.txt">4k1b-o</option>
+    <option value="4k1b-p.txt">4k1b-p</option>
+    <option value="4k1b-q.txt">4k1b-q</option>
+    <option value="4k1b-r.txt">4k1b-r</option>
+    <option value="4k1b-s.txt">4k1b-s</option>
+    <option value="4k1b-t.txt">4k1b-t</option>
+    <option value="4k1b-u.txt">4k1b-u</option>
+    <option value="4k1b-v.txt">4k1b-v</option>
+    <option value="4k1b-w.txt">4k1b-w</option>
+    <option value="4k1b-y.txt">4k1b-y</option>
+    <option value="4k1b-z.txt">4k1b-z</option>
+    <option value="level2.txt">level2</option>
+    <option value="level3.txt">level3</option>
+  </select>
+</div>
+
+<div id="wordButtons"></div>
+
+<div class="word-display">
+  <h3>Current Word</h3>
+  <span id="currentWord">None</span>
+  <div id="definition-container"></div>
+</div>
+
+<!-- <div class="action-buttons">
+  <button onclick="speakWord()">🔊 Say Word Again</button>
+  <button onclick="startSpelling()">🎤 Spell It</button>
+  <button onclick="resetSpelling()">🔁 Reset</button>
+</div> -->
+
+<div id="result"></div>
+
+<!-- <div class="add-word-section">
+  <h3>Add New Word (current level only)</h3>
+  <div class="input-group">
+    <input type="text" id="newWordInput" placeholder="Enter a new word..." />
+    <button onclick="addNewWord()">➕ Add</button>
+  </div>
+</div> -->
+
+<script>
+  let words = [];
+  let currentWord = "";
+
+  // ---------- Speech synthesis ----------
+  function speak(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    speechSynthesis.speak(utterance);
+  }
+
+  function speakWord() {
+    if (currentWord) speak(currentWord);
+  }
+
+  // ---------- Speech recognition ----------
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+
+  recognition.onresult = (event) => {
+    const spoken = event.results[0][0].transcript
+      .toLowerCase()
+      .replace(/\s+/g, "");
+
+    const correct = currentWord.toLowerCase();
+
+    if (spoken === correct) {
+      result.innerHTML = "✅ Correct!";
+      result.className = "correct";
+      speak("Correct");
+    } else {
+      result.innerHTML = `❌ You said: <b>${spoken}</b>`;
+      result.className = "wrong";
+      speak("Try again");
+    }
+  };
+
+  function startSpelling() {
+    if (!currentWord) return alert("Select a word first!");
+    result.innerHTML = "🎧 Listening...";
+    recognition.start();
+  }
+
+  function resetSpelling() {
+    result.innerHTML = "";
+  }
+
+  // ---------- Load words from selected file ----------
+  async function loadWords() {
+    const file = fileSelect.value;
+    const response = await fetch("lists/" + file);
+    const text = await response.text();
+
+    const fileWords = text
+      .split("\n")
+      .map(w => w.trim())
+      .filter(Boolean);
+
+    const savedWords =
+      JSON.parse(localStorage.getItem("extraWords_" + file) || "[]");
+
+    words = [...new Set([...fileWords, ...savedWords])];
+    currentWord = "";
+    currentWordSpan.textContent = "None";
+    renderButtons();
+    resetSpelling();
+  }
+
+  function renderButtons() {
+    wordButtons.innerHTML = "";
+    words.forEach(word => {
+      const btn = document.createElement("button");
+      btn.className = "word-btn";
+      btn.textContent = word;
+      btn.onclick = () => selectWord(word);
+      wordButtons.appendChild(btn);
+    });
+  }
+
+  async function selectWord(word) {
+    currentWord = word;
+    currentWordSpan.textContent = word;
+    resetSpelling();
+    speak(word);
+    await fetchWordDefinition(word);
+  }
+
+  async function fetchWordDefinition(word) {
+    const defContainer = document.getElementById('definition-container');
+    const cacheKey = `def_cache_${word.toLowerCase()}`;
+
+    // Check if definition is already cached
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      console.log(`✅ Using cached definition for "${word}"`);
+      displayDefinition(JSON.parse(cachedData), true);
+      return;
+    }
+
+    defContainer.innerHTML = '<div class="loading">Loading definition...</div>';
+
+    try {
+      const apiUrl = `https://dictionary-api-7hmy.onrender.com/define?word=${encodeURIComponent(word)}`;
+      const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+      const response = await fetch(corsProxyUrl);
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // Cache the response
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      console.log(`💾 Cached definition for "${word}"`);
+      displayDefinition(data, false);
+    } catch (error) {
+      defContainer.innerHTML = `<div class="error">Could not fetch definition. Error: ${error.message}</div>`;
+    }
+  }
+
+  function displayDefinition(data, isCached = false) {
+    const defContainer = document.getElementById('definition-container');
+    let html = '<div class="word-definition">';
+
+    const cacheIndicator = isCached ? ' <span style="font-size: 12px; color: #999;">(cached)</span>' : '';
+    html += `<div style="font-size: 12px; color: #999; margin-bottom: 10px;">${isCached ? '📦 Cached' : '🌐 From API'}${cacheIndicator}</div>`;
+
+    if (data.pronunciation) {
+      html += `<div class="pronunciation">/${data.pronunciation}/</div>`;
+    }
+
+    if (data.meanings && Array.isArray(data.meanings)) {
+      data.meanings.forEach((meaning, idx) => {
+        html += '<div class="definition-item">';
+        if (meaning.partOfSpeech) {
+          html += `<div class="definition-label">${meaning.partOfSpeech}</div>`;
+        }
+        if (meaning.definitions && Array.isArray(meaning.definitions)) {
+          html += '<ul class="meanings-list">';
+          meaning.definitions.forEach(def => {
+            html += `<li>${def.definition || def}</li>`;
+          });
+          html += '</ul>';
+        }
+        html += '</div>';
+      });
+    } else if (data.definition) {
+      html += `<div class="definition-item"><div class="definition-value">${data.definition}</div></div>`;
+    } else if (data.meaning) {
+      html += `<div class="definition-item"><div class="definition-value">${data.meaning}</div></div>`;
+    }
+
+    html += '<div class="definition-item" style="margin-top: 15px;"><div class="definition-label">Full API Response:</div><pre style="background: #f0f0f0; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; max-height: 200px; overflow-y: auto;">' + JSON.stringify(data, null, 2) + '</pre></div>';
+
+    html += '</div>';
+    defContainer.innerHTML = html;
+  }
+
+  function addNewWord() {
+    const input = newWordInput.value.trim().toLowerCase();
+    if (!input) return;
+
+    const file = fileSelect.value;
+    const key = "extraWords_" + file;
+
+    const saved =
+      JSON.parse(localStorage.getItem(key) || "[]");
+
+    saved.push(input);
+    localStorage.setItem(key, JSON.stringify(saved));
+
+    newWordInput.value = "";
+    loadWords();
+  }
+
+  const result = document.getElementById("result");
+  const currentWordSpan = document.getElementById("currentWord");
+  const wordButtons = document.getElementById("wordButtons");
+  const newWordInput = document.getElementById("newWordInput");
+  const fileSelect = document.getElementById("fileSelect");
+
+  // Load default level on page load
+  loadWords();
+</script>
+
+</body>
+</html>
